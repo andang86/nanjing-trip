@@ -230,8 +230,7 @@
   const db = getFirestore(app);
 
   // 문서 경로: artifacts/{appId}/public/trip/status
-  const docRef = doc(db, "artifacts", appId, "public", "trip_confirmations", "status");
-
+ const docRef = doc(db, "artifacts", appId, "public", "trip_confirmations", "status"); 
 
   async function firebaseInitAuth(){
     try{
