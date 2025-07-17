@@ -526,34 +526,157 @@ const docRef = doc(db, "artifacts", appId, "public", "status");
     document.getElementById('section-checklist').innerHTML=clHTML;
 
     // Schedule
-    document.getElementById('section-schedule').innerHTML=`
-      <div class="accordion-header flex justify-between items-center p-5">
+document.getElementById('section-schedule').innerHTML = `
+    <div class="accordion-header flex justify-between items-center p-5">
         <h2 class="text-xl font-semibold text-blue-700"><i class="fas fa-calendar-alt mr-3"></i>3박 4일 세부 일정표</h2>
         <div class="flex items-center space-x-2">
-          <label for="check-schedule" class="text-sm font-medium text-gray-600">확인완료</label>
-          <input type="checkbox" id="check-schedule" data-section="schedule" class="h-5 w-5 rounded border-gray-300 text-blue-600">
+            <label for="check-schedule" class="text-sm font-medium text-gray-600">확인완료</label>
+            <input type="checkbox" id="check-schedule" data-section="schedule" class="h-5 w-5 rounded border-gray-300 text-blue-600">
         </div>
         <i class="fas fa-chevron-down icon ml-4"></i>
-      </div>
-      <div class="accordion-content p-5 border-t border-gray-200">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead class="bg-blue-50">
-              <tr><th class="p-3 font-semibold text-sm">일자</th><th class="p-3 font-semibold text-sm">주요 활동</th><th class="p-3 font-semibold text-sm">식사</th></tr>
-            </thead>
-           <tbody>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">1일차 (7/26)</td><td class="p-3">오전/오후</td><td class="p-3">인천공항 집결(09:20), 남경 도착</td><td rowspan="2" class="p-3 align-top">석: 현지식</td></tr>
-            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">교부영, 부자묘 옛거리 관광</td></tr>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">2일차 (7/27)</td><td class="p-3">오전</td><td class="p-3">남경대학살기념관, 이제항 위안부 박물관</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
-            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">중산릉, 명효릉 관광 후 전신 마사지 체험</td></tr>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">3일차 (7/28)</td><td class="p-3">오전</td><td class="p-3">우수산 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
-            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">더지플라자, 독립군 본부 터, 현무공원(뱃놀이)</td></tr>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">4일차 (7/29)</td><td class="p-3">오전</td><td class="p-3">남경 중화문 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식</td></tr>
-            <tr><td class="p-3">오후</td><td class="p-3">공항 이동 및 인천 도착(18:10)</td></tr>
-          </tbody>
-          </table>
+    </div>
+    <div class="accordion-content p-5 border-t border-gray-200">
+        <div class="space-y-6">
+
+            <div class="p-5 border rounded-lg bg-white shadow-sm">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">1일차 (7/26, 토): 남경 도착 및 옛거리 탐방</h3>
+                <div class="relative pl-8">
+                    <div class="absolute left-3 top-1 bottom-1 w-0.5 bg-gray-200"></div>
+
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">09:20 - 인천공항 집결</p>
+                        <p class="text-sm text-gray-600">제1여객터미널 3층 F열, 단체 수속</p>
+                        <span class="text-xs font-semibold text-red-600 bg-red-100 px-2 py-1 rounded-full">시간 엄수!</span>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-plane-departure"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">12:20 - 남경으로 출발 (OZ349)</p>
+                        <p class="text-sm text-gray-600">비행 중 기내식 제공</p>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-camera-retro"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">오후 - 교부영, 부자묘 옛거리 관광</p>
+                        <p class="text-sm text-gray-600">남경의 역사와 문화를 느낄 수 있는 대표 명소 방문</p>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-yellow-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">저녁 식사 (현지식)</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">호텔 체크인 및 휴식</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 border rounded-lg bg-white shadow-sm">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">2일차 (7/27, 일): 아픈 역사와 마주하기</h3>
+                <div class="relative pl-8">
+                    <div class="absolute left-3 top-1 bottom-1 w-0.5 bg-gray-200"></div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-slate-600 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-monument"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">오전 - 남경대학살기념관, 위안부 박물관</p>
+                        <p class="text-sm text-gray-600">잊지 말아야 할 역사의 현장 방문</p>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-teal-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">오후 - 중산릉, 명효릉 관광</p>
+                        <p class="text-sm text-gray-600">중국의 근대사와 명나라 시대의 웅장함 체험</p>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-cyan-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">저녁 - 전신 마사지 체험</p>
+                        <p class="text-sm text-gray-600">하루의 피로를 푸는 시간</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-yellow-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">저녁 식사 (현지식)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 border rounded-lg bg-white shadow-sm">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">3일차 (7/28, 월): 자연과 도심 속 힐링</h3>
+                <div class="relative pl-8">
+                    <div class="absolute left-3 top-1 bottom-1 w-0.5 bg-gray-200"></div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">오전 - 우수산 관광</p>
+                        <p class="text-sm text-gray-600">아름다운 자연 경관과 불교 문화 탐방</p>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-sky-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">오후 - 더지플라자, 독립군 본부 터</p>
+                        <p class="text-sm text-gray-600">남경의 현대적인 모습과 대한민국 임시정부의 발자취</p>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-indigo-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-ship"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">저녁 - 현무공원(뱃놀이)</p>
+                        <p class="text-sm text-gray-600">호수 위에서 즐기는 남경의 야경</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-yellow-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">저녁 식사 (현지식)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 border rounded-lg bg-white shadow-sm">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">4일차 (7/29, 화): 마지막 여정 그리고 복귀</h3>
+                <div class="relative pl-8">
+                    <div class="absolute left-3 top-1 bottom-1 w-0.5 bg-gray-200"></div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-archway"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">오전 - 남경 중화문 관광</p>
+                        <p class="text-sm text-gray-600">견고한 성벽을 거닐며 여행 마무리</p>
+                    </div>
+                    <div class="relative mb-5">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-plane-departure"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">오후 - 남경 공항으로 이동 및 출국</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute left-[-2.1rem] top-1 w-10 h-10 bg-gray-700 text-white rounded-full flex items-center justify-center ring-4 ring-white">
+                            <i class="fas fa-house-chimney"></i>
+                        </div>
+                        <p class="font-semibold text-gray-800">저녁 - 인천 도착</p>
+                        <p class="text-sm text-gray-600">모든 일정 종료, 해산</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
-      </div>`;
+    </div>`;
   }
 
   /* ------------------ 사용자 상태 적용 ------------------ */
