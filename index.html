@@ -411,6 +411,15 @@ const docRef = doc(db, "artifacts", appId, "public", "status");
         </div>
         <i class="fas fa-chevron-down icon ml-4"></i>
       </div>
+        <div class="info-section">
+    <h4 class="info-title"><i class="fas fa-users-cog mr-2"></i>주요 담당자 안내</h4>
+    <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+      <li><strong>총괄 리더: 김현정</strong> – 전체 일정, 가이드 소통, 공동경비.</li>
+      <li><strong>통신/기술 지원: 안상현</strong> – 로밍/유심, 결제 앱, 스마트폰 문제 도움.</li>
+      <li><strong>건강 담당: 김현주</strong> – 공용 구급약, 건강 관련 지원.</li>
+    </ul>
+  </div>
+
       <div class="accordion-content p-5 border-t border-gray-200 space-y-4">
         <div class="info-section">
           <h4 class="info-title"><i class="fas fa-walking mr-2"></i>건강 및 체력 관리</h4>
@@ -431,13 +440,15 @@ const docRef = doc(db, "artifacts", appId, "public", "status");
               <tr><td class="font-semibold">장점</td><td>한국 번호 유지, 인증 편리</td><td>저렴하고 빠른 현지 데이터</td></tr>
             </tbody>
           </table>
-          <div class="highlight-box">
-            <p class="font-bold text-lg">우리 팀의 준비 계획</p>
-            <ul class="list-disc list-inside mt-2">
-              <li><strong>중요 연락 담당 (김현정)</strong>: <span class="font-bold text-blue-600">국제 로밍</span> 사용.</li>
-              <li><strong>나머지 팀원 (5명)</strong>: <span class="font-bold text-blue-600">중국 현지 유심(eSIM)</span> 사용 권장. 준비는 <span class="font-bold">안상현</span>께 문의.</li>
-            </ul>
-          </div>
+       <div class="highlight-box">
+  <p class="font-bold text-lg">어떻게 할까? (선택 가이드)</p>
+  <ul class="list-disc list-inside mt-2">
+    <li><strong>김현정(총괄 리더)</strong>는 한국 번호 인증이 필요해 <span class="font-bold text-blue-600">국제 로밍</span>을 쓸 예정.</li>
+    <li><strong>다른 팀원들</strong>: <span class="font-bold">로밍 또는 현지 유심(eSIM) 중 편한 것 선택</span>. 둘 다 준비 안 했거나 어렵다면 공항에서 <strong>안상현(통신/기술)</strong>이 도와준다.</li>
+    <li class="text-gray-700 text-sm mt-1">※ 카톡/문자 인증이 꼭 필요하면 로밍이 편하고, 데이터만 쓰면 유심이 더 저렴하다.</li>
+  </ul>
+</div>
+
         </div>
         <div class="info-section">
           <h4 class="info-title"><i class="fas fa-money-bill-wave mr-2"></i>개인 경비 및 중국 현지 결제 방법</h4>
