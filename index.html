@@ -518,9 +518,16 @@ const docRef = doc(db, "artifacts", appId, "public", "status");
   /* ------------------ 사용자 상태 적용 ------------------ */
   function applyUserState(user){
     const ud = confirmationData[user] || {};
-    Object.keys(sections).forEach(k=>{
-      const el=document.getElementById(`check-${k}`);
-      if(el) el.checked=!!ud[k];
+    Object.keys(sections).forEach(k => {
+        const el = document.getElementById(`check-${k}`);
+        if (el) {
+            // '준비물' 섹션은 checklist_all 값을 사용하고, 나머지는 원래대로 사용
+            if (k === 'checklist') {
+                el.checked = !!userData.checklist_all;
+            } else {
+                el.checked = !!userData[k];
+            }
+        }
     });
     // 개별 준비물
     document.querySelectorAll('#section-checklist input[type=checkbox][data-item]').forEach(cb=>cb.checked=false);
