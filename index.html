@@ -429,31 +429,49 @@ const docRef = doc(db, "artifacts", appId, "public", "status");
           <h4 class="info-title"><i class="fas fa-utensils mr-2"></i>식사 및 비상 식량</h4>
           <p>여행 중 1회 한식당을 이용할 예정입니다. 그 외 현지 음식이 입맛에 맞지 않을 경우를 대비하여, 비상 식량(김, 김치, 컵라면, 햇반 등)을 준비했습니다. (담당: 김현정)</p>
         </div>
-   <div class="info-section">
-        <h4 class="info-title"><i class="fas fa-wifi mr-2"></i>인터넷 사용: 로밍 vs 현지 유심</h4>
-        <p class="mb-4">중국 현지에서 인터넷 사용 시, **국제 로밍**과 **현지 유심(eSIM)** 중 개인의 필요에 맞게 자유롭게 선택할 수 있습니다. 아래는 장단점과 추천 방법이며, **필수 사항이 아닙니다.**</p>
-        <table class="w-full comparison-table mb-4">
-          <thead><tr><th>구분</th><th>국제 로밍</th><th>중국 현지 유심 (eSIM)</th></tr></thead>
-          <tbody>
-            <tr><td class="font-semibold">카톡/Gmail</td><td class="text-green-600 font-bold">바로 사용 가능 (VPN 불필요)</td><td class="text-red-600 font-bold">사용 불가 (VPN 필요)</td></tr>
-            <tr><td class="font-semibold">요금</td><td>비교적 높음</td><td>매우 저렴</td></tr>
-            <tr><td class="font-semibold">장점</td><td>한국 번호 유지, 인증 편리</td><td>저렴하고 빠른 현지 데이터</td></tr>
-          </tbody>
-        </table>
-        <div class="highlight-box">
-          <p class="font-bold text-lg">👍 추천 방법 및 담당 안내</p>
-          <ul class="list-disc list-inside mt-2 space-y-1">
-            <li>한국과 연락을 계속해야 하거나 VPN 사용이 번거롭다면 <span class="font-bold text-blue-600">국제 로밍</span>을 추천합니다.</li>
-            <li>데이터를 저렴하고 빠르게 쓰고 싶다면 <span class="font-bold text-blue-600">중국 현지 유심(eSIM)</span>을 추천합니다.</li>
-            <li class="mt-3"><strong>※ 도움이 필요하시면 담당자에게 편하게 문의하세요.</strong></li>
-            <ul class="list-inside ml-4 text-sm">
-                <li><span class="font-semibold">로밍 관련 문의:</span> 김현정</li>
-                <li><span class="font-semibold">현지 유심(eSIM) 관련 문의:</span> 안상현</li>
-            </ul>
-          </ul>
-        </div>
-      </div>
-
+ <table class="w-full border-collapse text-left">
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="w-1/6 border p-3 font-semibold">구분</th>
+      <th class="w-5/12 border p-3 font-semibold">현지 유심 / eSIM</th>
+      <th class="w-5/12 border p-3 font-semibold">국제 로밍 (한국 유심)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="align-top">
+      <td class="border bg-green-50 p-4 font-bold text-green-800">장점 👍</td>
+      <td class="border p-4">
+        <ul class="list-disc list-inside space-y-2 text-sm">
+          <li>데이터 요금이 매우 저렴하고 네트워크가 안정적</li>
+          <li>바이두, 위챗 등 현지 앱 사용에 용이</li>
+        </ul>
+      </td>
+      <td class="border p-4">
+        <ul class="list-disc list-inside space-y-2 text-sm">
+          <li>VPN 없이 Gmail, 카카오톡, 인스타 등 즉시 사용 가능</li>
+          <li>한국 번호를 그대로 사용해 인증 및 연락이 편리</li>
+          <li>설정이 간편하고 별도의 우회 작업이 불필요</li>
+        </ul>
+      </td>
+    </tr>
+    <tr class="align-top">
+      <td class="border bg-red-50 p-4 font-bold text-red-800">단점 👎</td>
+      <td class="border p-4">
+        <ul class="list-disc list-inside space-y-2 text-sm">
+          <li>Gmail, 카카오톡 등 대부분의 한국/해외 서비스는 <strong>유료 VPN을 설치해야만 사용 가능</strong></li>
+          <li>최근 VPN 단속으로 일부 서비스가 불안정할 수 있음</li>
+          <li>무료 VPN은 보안 위험이 크고 접속 및 속도 보장이 어려움</li>
+        </ul>
+      </td>
+      <td class="border p-4">
+        <ul class="list-disc list-inside space-y-2 text-sm">
+          <li>요금이 비쌈 (일 1~2만원대 또는 제한적인 무제한 옵션)</li>
+          <li>데이터 사용량이나 속도에 제한이 있을 수 있음</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
         </div>
         <div class="info-section">
           <h4 class="info-title"><i class="fas fa-money-bill-wave mr-2"></i>개인 경비 및 중국 현지 결제 방법</h4>
