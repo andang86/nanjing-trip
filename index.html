@@ -210,7 +210,7 @@
 
   // 단일 문서 경로 (문서로 끝나야 함!)
   // artifacts/{appId}/public/trip_confirmations_status
-  const docRef = doc(db, "artifacts", appId, "public", "trip_confirmations_status");
+const docRef = doc(db, "artifacts", appId, "trip_confirmations", "status");
 
   async function firebaseInitAuth(){
     try{
