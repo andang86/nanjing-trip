@@ -33,8 +33,7 @@
 
 <!-- 🔥 Firebase 설정값을 이곳에 넣으세요 (배포 전 필수) -->
 <script>
-  /* === FILL THESE BEFORE DEPLOY === */
-  // Import the functions you need from the SDKs you need
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -52,8 +51,9 @@ const firebaseConfig = {
   measurementId: "G-1NJ9PW5TF8"
 };
 
-  const __app_id = "freene-nanjing-2025";  // 자유롭게
-  const __initial_auth_token = "";         // 익명 로그인 쓸 거면 비워둠
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 </script>
 
 <div id="app-root" class="container mx-auto max-w-4xl p-4 sm:p-8">
