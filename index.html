@@ -541,12 +541,16 @@ const docRef = doc(db, "artifacts", appId, "public", "status");
             <thead class="bg-blue-50">
               <tr><th class="p-3 font-semibold text-sm">일자</th><th class="p-3 font-semibold text-sm">주요 활동</th><th class="p-3 font-semibold text-sm">식사</th></tr>
             </thead>
-            <tbody>
-              <tr class="border-b"><td class="p-3 font-medium">1일차 (7/26, 토)</td><td class="p-3">인천공항 집결(09:20) 및 출국, 남경 도착. 교부영, 부자묘 옛거리 관광.</td><td class="p-3">석: 현지식</td></tr>
-              <tr class="border-b"><td class="p-3 font-medium">2일차 (7/27, 일)</td><td class="p-3">남경대학살기념관, 위안부 박물관, 중산릉, 명효릉 관광 후 전신 마사지 체험.</td><td class="p-3">조: 호텔, 중: 현지, 석: 현지</td></tr>
-              <tr class="border-b"><td class="p-3 font-medium">3일차 (7/28, 월)</td><td class="p-3">우수산, 더지플라자, 독립군 본부 터, 현무공원(뱃놀이) 관광.</td><td class="p-3">조: 호텔, 중: 현지, 석: 현지</td></tr>
-              <tr><td class="p-3 font-medium">4일차 (7/29, 화)</td><td class="p-3">남경 중화문 관광 후 공항 이동, 인천 도착.</td><td class="p-3">조: 호텔, 중: 현지</td></tr>
-            </tbody>
+           <tbody>
+            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">1일차 (7/26)</td><td class="p-3">오전/오후</td><td class="p-3">인천공항 집결(09:20), 남경 도착</td><td rowspan="2" class="p-3 align-top">석: 현지식</td></tr>
+            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">교부영, 부자묘 옛거리 관광</td></tr>
+            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">2일차 (7/27)</td><td class="p-3">오전</td><td class="p-3">남경대학살기념관, 이제항 위안부 박물관</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
+            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">중산릉, 명효릉 관광 후 전신 마사지 체험</td></tr>
+            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">3일차 (7/28)</td><td class="p-3">오전</td><td class="p-3">우수산 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
+            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">더지플라자, 독립군 본부 터, 현무공원(뱃놀이)</td></tr>
+            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">4일차 (7/29)</td><td class="p-3">오전</td><td class="p-3">남경 중화문 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식</td></tr>
+            <tr><td class="p-3">오후</td><td class="p-3">공항 이동 및 인천 도착(18:10)</td></tr>
+          </tbody>
           </table>
         </div>
       </div>`;
