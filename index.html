@@ -3,49 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>프리네가족팀 남경 여행 - 오프라인 최종 점검</title>
-  <!--
-    프리네가족팀 남경 여행 통합 오프라인 페이지 (v1+v2 통합)
-    ------------------------------------------------------------
-    • 기능: 팀원 선택 기반 개인 체크 + 전체 현황 표 + 아코디언 섹션 + CSV 내보내기 + 데이터 백업/복원.
-    • 저장: 브라우저 localStorage 이용 (여러 기기 간 동기화 X). CSV/코드 복사로 수동 공유.
-    • Tailwind CDN 시도 후 실패 시 필수 최소 스타일 fallback 유지.
-    • 본문 텍스트는 사용자가 제공한 두 버전의 HTML 내용을 축약 없이 최대한 보존/통합했습니다.
-    • 실시간 공유(Firebase) 필요 시 하단 가이드 주석 참고.
-  -->
+  <title>프리네가족팀 남경 여행 - GitHub Pages + 온라인 공유 버전</title>
+  <!-- =============================================================
+       프리네가족팀 남경 여행 통합 페이지 (GitHub Pages 배포용)
+       버전: 2025-07-17 v3 (online-ready)
+       -------------------------------------------------------------
+       포함 기능
+       1) 팀원 선택 개인 모드 (localStorage 저장)
+       2) 전체 현황 테이블(섹션별 숙지 여부) - Firestore 실시간 공유
+       3) 준비물 체크리스트 (기기 로컬) + 준비물 점수(개수)만 Firestore 업로드 (프라이버시 보호)
+       4) CSV 내보내기 (모바일 호환 / Web Share API 지원)
+       5) 전체 초기화(버전 키) / 사용자가 수동 초기화 버튼
+       6) 아코디언 UI, 접근성 ARIA 일부 반영
+       7) 다크모드 토글(선택) - 시스템 설정 반영
 
-  <!-- Tailwind (online) -->
+       사용 전 반드시 ↓ Firebase 설정 절차 참고.
+       ============================================================= -->
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Inter + Noto Sans KR -->
+  <!-- 폰트 -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
     :root {
-      --blue-600: #2563eb;
-      --blue-700: #1d4ed8;
-      --amber-400: #fbbf24;
-      --amber-500: #f59e0b;
-      --gray-50: #f9fafb;
-      --gray-100: #f3f4f6;
-      --gray-200: #e5e7eb;
-      --gray-300: #d1d5db;
-      --gray-400: #9ca3af;
-      --gray-500: #6b7280;
-      --gray-700: #374151;
-      --red-500: #ef4444;
-      --green-600: #16a34a;
+      color-scheme: light dark;
     }
     body {
       font-family: 'Inter','Noto Sans KR',sans-serif;
       background-color: #f7fafc;
-      color: #1f2937;
+      line-height: 1.45;
     }
+    .dark body {
+      background-color: #1a1a1a;
+      color: #e5e7eb;
+    }
+
+    /* Generic boxes */
     .section-box {
-      background-color: #fff;
+      background-color: white;
       border-radius: 0.5rem;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),0 2px 4px -2px rgb(0 0 0 / 0.1);
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       border: 1px solid #e2e8f0;
+    }
+    .dark .section-box {
+      background-color: #252525;
+      border-color: #444;
     }
     .section-header {
       display: flex;
@@ -55,670 +59,766 @@
       padding: 1.25rem;
       border-bottom: 1px solid #e2e8f0;
     }
-    @media (min-width: 640px){
-      .section-header{flex-direction:row;align-items:center;justify-content:space-between}
+    @media (min-width: 640px) {
+      .section-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
     }
-    .section-title{font-size:1.25rem;font-weight:600;color:#1e3a8a}
-    .section-content{padding:1.25rem}
-    input[type="checkbox"]{cursor:pointer}
-    input[type="checkbox"]:focus{outline:2px solid #3b82f6;outline-offset:2px}
-    input[type="checkbox"]:checked+label{text-decoration:line-through;color:#a0aec0}
-    .info-section{padding:1rem;background-color:#f8fafc;border-radius:8px;margin-bottom:1rem}
-    .info-title{font-weight:600;color:#1e3a8a;margin-bottom:0.5rem}
-    .highlight-box-blue{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin-top:1rem;border-radius:4px}
-    .highlight-box-amber{background-color:#fffbeb;border-left:4px solid #f59e0b;padding:1rem;margin-top:1rem;border-radius:4px}
-    .comparison-table th,.comparison-table td{border:1px solid #e2e8f0;padding:0.75rem;text-align:center}
-    .comparison-table th{background-color:#f1f5f9}
+    .dark .section-header {
+      border-color: #444;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+    .dark .section-title {
+      color: #93c5fd;
+    }
+    .section-content { padding: 1.25rem; }
+
+    input[type="checkbox"] { cursor: pointer; }
+    input[type="checkbox"]:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+    input[type="checkbox"]:checked + label {
+      text-decoration: line-through;
+      color: #a0aec0;
+    }
+
+    /* Info blocks */
+    .info-section {
+      padding: 1rem;
+      background-color: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .dark .info-section { background-color: #374151; }
+    .info-title {
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 0.5rem;
+    }
+    .dark .info-title { color: #bfdbfe; }
+
+    .highlight-box {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 4px;
+    }
+    .dark .highlight-box {
+      background-color: #4b3d18;
+      border-left-color: #d97706;
+    }
+
+    /* Tables */
+    .comparison-table th, .comparison-table td,
+    .confirmation-table th, .confirmation-table td {
+      border: 1px solid #e2e8f0;
+      padding: 0.75rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    .comparison-table th, .confirmation-table th {
+      background-color: #f1f5f9;
+    }
+    .dark .comparison-table th, .dark .confirmation-table th {
+      background-color: #374151;
+    }
+    .dark .comparison-table td, .dark .confirmation-table td {
+      border-color: #4b5563;
+    }
+    .confirmation-table .member-name { text-align: left; font-weight: 600; }
+
     /* Accordion */
-    .accordion-header{cursor:pointer;user-select:none}
-    .accordion-content{display:none;overflow:hidden;transition:max-height .3s ease-out}
-    .accordion-header .icon{transition:transform .3s ease-out}
-    .accordion-header.active .icon{transform:rotate(180deg)}
-    /* Confirmation table */
-    .confirmation-table th,.confirmation-table td{text-align:center;padding:0.75rem 0.5rem;border:1px solid #e2e8f0}
-    .confirmation-table th{background-color:#f8fafc}
-    .confirmation-table .member-name{text-align:left;font-weight:600}
-    .confirmation-table input[type="checkbox"]{width:1.25rem;height:1.25rem;cursor:pointer}
-    /* Screens */
-    #login-screen{display:block}
-    #user-screen{display:none}
-    #summary-screen{display:none}
-    /* Floating summary button */
-    .floating-summary-btn{position:fixed;bottom:1.25rem;right:1.25rem;z-index:50}
+    .accordion-header { cursor: pointer; }
+    .accordion-content {
+      display: none;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .accordion-header .icon { transition: transform 0.3s ease-out; }
+    .accordion-header.active .icon { transform: rotate(180deg); }
+
+    /* Top utilities */
+    .toolbar-btn {
+      @apply bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition text-sm;
+    }
+    .toolbar-btn-primary {
+      @apply bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition text-sm;
+    }
+    .toolbar-btn-danger {
+      @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition text-sm;
+    }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
-  <!-- ================= HEADER (common) ================= -->
-  <header class="w-full text-center py-8">
-    <h1 class="text-3xl sm:text-4xl font-bold text-blue-600">프리네가족팀 남경 여행</h1>
-    <p class="text-lg text-gray-600 mt-2">최종 점검 및 준비자료 (오프라인판)</p>
-  </header>
+<body class="bg-gray-50 text-gray-800 dark:text-gray-100 dark:bg-gray-900">
 
-  <!-- ================= SCREEN: LOGIN ================= -->
-  <main id="login-screen" class="container mx-auto max-w-2xl p-4 sm:p-8 text-center">
-    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-md">
-      <h2 class="text-xl sm:text-2xl font-semibold mb-6">본인의 이름을 선택하여<br>여행 준비를 시작하세요.</h2>
+<!-- =============================================================
+     FIREBASE 런타임 설정 (필수 편집)
+     -------------------------------------------------------------
+     GitHub Pages에 올린 후, 아래 스크립트에서 실제 Firebase 구성값을 넣으세요.
+     • __firebase_config : Firebase 콘솔 → 프로젝트 설정 → 웹앱 → 구성 스니펫(JS)에서 복사
+     • __app_id : 문서 구분용 문자열 (예: 'freene-nanjing-2025')
+     • __initial_auth_token : 익명 인증 쓸 거면 빈 문자열 유지.
+
+     아래 값을 수정하지 않으면 Firestore 기능은 자동으로 비활성화됩니다(안전).
+============================================================= -->
+<script>
+  // ==== 편집 구역 시작 ====
+  const __firebase_config = JSON.stringify({
+    apiKey: "REPLACE_ME",
+    authDomain: "REPLACE_ME.firebaseapp.com",
+    projectId: "REPLACE_ME",
+    appId: "REPLACE_ME"
+  });
+  const __app_id = 'freene-nanjing-2025';
+  const __initial_auth_token = '';// 익명 사용
+  // ==== 편집 구역 끝 ====
+</script>
+
+<!-- ============================================================= -->
+<div id="app-root">
+  <!-- Screen 1: Name Selection -->
+  <div id="login-screen" class="container mx-auto max-w-2xl p-4 sm:p-8 text-center">
+    <header class="mb-10">
+      <h1 class="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">프리네가족팀 남경 여행</h1>
+      <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">최종 점검 및 준비자료</p>
+    </header>
+    <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-lg shadow-md">
+      <h2 class="text-xl sm:text-2xl font-semibold mb-6">본인의 이름을 선택하여<br />여행 준비를 시작하세요.</h2>
       <div id="name-selector" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
-      <div class="mt-8 space-y-2">
-        <button id="goto-summary-from-login" class="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-table mr-2"></i>전체 현황 보기</button>
-        <button id="import-data-button-login" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-file-import mr-2"></i>데이터 불러오기</button>
+      <div class="mt-6 flex justify-center gap-4 text-sm text-gray-500 dark:text-gray-300">
+        <button id="goto-online-table" class="underline">전체 현황 보기</button>
       </div>
     </div>
-  </main>
+  </div>
 
-  <!-- ================= SCREEN: USER MODE ================= -->
-  <section id="user-screen" class="container mx-auto max-w-4xl p-4 sm:p-8">
+  <!-- Screen 2: Main Content (개인 모드) -->
+  <div id="main-screen" class="container mx-auto max-w-4xl p-4 sm:p-8 hidden">
     <header class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10">
       <div class="text-center sm:text-left">
-        <h1 class="text-2xl sm:text-3xl font-bold text-blue-600"><span id="user-name"></span>님, 환영합니다!</h1>
-        <p class="text-md text-gray-600 mt-1">아래 항목들을 확인하고 준비를 완료해주세요.</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400"><span id="user-name"></span>님, 환영합니다!</h1>
+        <p class="text-md text-gray-600 dark:text-gray-300 mt-1">아래 항목들을 확인하고 준비를 완료해주세요.</p>
       </div>
       <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-        <button id="user-export-csv-button" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-file-csv mr-2"></i>전체 현황 내보내기</button>
-        <button id="user-import-data-button" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-file-import mr-2"></i>불러오기</button>
-        <button id="user-summary-button" class="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-table mr-2"></i>전체 현황</button>
-        <button id="logout-button" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-arrow-left mr-2"></i>이름 다시 선택</button>
+        <button id="export-csv-button" class="toolbar-btn-primary"><i class="fas fa-file-csv mr-2"></i>전체 현황 내보내기</button>
+        <button id="reset-data-button" class="toolbar-btn-danger"><i class="fas fa-rotate mr-2"></i>내 체크 초기화</button>
+        <button id="logout-button" class="toolbar-btn"><i class="fas fa-arrow-left mr-2"></i>이름 다시 선택</button>
       </div>
     </header>
 
-    <div class="space-y-6" id="user-content-sections"><!-- injected --></div>
-  </section>
+    <div class="mb-6 p-4 rounded-md border text-sm bg-yellow-50 dark:bg-yellow-900/40 dark:border-yellow-500/50 text-yellow-700 dark:text-yellow-300">
+      <strong>온라인 공유 안내:</strong> 집결계획/안내/일정표 숙지 여부와 준비물 체크 개수(숫자)만 가족 전체와 공유됩니다. 세부 준비물 항목은 공개되지 않습니다.
+      <label class="ml-4 inline-flex items-center gap-2 cursor-pointer select-none">
+        <input id="online-share-toggle" type="checkbox" class="h-4 w-4" /> 온라인 공유 활성화
+      </label>
+    </div>
 
-  <!-- ================= SCREEN: SUMMARY ================= -->
-  <section id="summary-screen" class="container mx-auto max-w-4xl p-4 sm:p-8">
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-5 mb-8">
-      <h2 class="text-xl font-semibold text-blue-700 mb-4 text-center"><i class="fas fa-user-check mr-3"></i>팀원별 숙지사항 확인 현황</h2>
-      <p class="text-center text-gray-600 mb-4">각자 자신의 이름을 찾아 숙지한 항목을 체크해주세요. (이 페이지는 <strong>로컬 저장</strong>됩니다. 여러 기기에서 공유하려면 CSV로 내보내 공유 후 불러오세요.)</p>
-      <div id="confirmation-container" class="overflow-x-auto"></div>
-      <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
-        <button id="summary-export-csv-button" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-file-csv mr-2"></i>CSV 내보내기</button>
-        <button id="summary-import-data-button" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-file-import mr-2"></i>불러오기</button>
-        <button id="summary-back-button" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition"><i class="fas fa-arrow-left mr-2"></i>돌아가기</button>
+    <div class="space-y-6" id="main-content-sections"></div>
+  </div>
+
+  <!-- Screen 3: 전체 현황 (온라인 테이블) -->
+  <div id="online-screen" class="container mx-auto max-w-4xl p-4 sm:p-8 hidden">
+    <header class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-blue-700 dark:text-blue-300"><i class="fas fa-user-check mr-2"></i>팀원별 숙지사항 확인 현황</h2>
+      <p class="text-gray-600 dark:text-gray-300 mt-2">섹션별 숙지 체크 및 준비물 진행률(숫자) 공유 화면.</p>
+    </header>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-5">
+      <div id="confirmation-container" class="overflow-x-auto text-sm">
+        <p class="text-center text-gray-500">확인 현황을 불러오는 중입니다...</p>
+      </div>
+      <div class="mt-4 flex justify-center gap-4 text-sm">
+        <button id="online-back-button" class="toolbar-btn"><i class="fas fa-arrow-left mr-1"></i>돌아가기</button>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Inline legend for clarity -->
-    <div class="max-w-md mx-auto text-sm text-gray-500 text-center">
-      <p>※ 상단 표는 큰 항목(집결계획·주요안내·준비물·일정표) 숙지 여부만 보여줍니다. 세부 체크리스트는 개인 화면에서 표시됩니다.</p>
-    </div>
-  </section>
+<!-- =============================================================
+     콘텐츠 섹션 템플릿 (개인 모드에서 동적 삽입)
+============================================================= -->
+<template id="tmpl-sections">
+  <div id="section-plan" class="section-box"></div>
+  <div id="section-info" class="section-box"></div>
+  <div id="section-checklist" class="section-box"></div>
+  <div id="section-schedule" class="section-box"></div>
+</template>
 
-  <!-- Floating Summary button (visible in user mode for quick jump) -->
-  <button id="floating-summary" class="floating-summary-btn hidden bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-full shadow-lg" title="전체 현황 보기"><i class="fas fa-table"></i></button>
+<!-- =============================================================
+     MAIN SCRIPT (모듈)
+============================================================= -->
+<script type="module">
+  /* ------------------------------------------------------------------
+   * 환경 구성 & 상수
+   * ---------------------------------------------------------------- */
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  <!-- ================= TEMPLATE MARKUP STRINGS (user view) ================= -->
-  <template id="tpl-user-content">
-    <div id="section-plan" class="section-box"></div>
-    <div id="section-info" class="section-box"></div>
-    <div id="section-checklist" class="section-box"></div>
-    <div id="section-schedule" class="section-box"></div>
-  </template>
+  // ===== 버전 / 저장키 =====
+  const APP_VERSION = 'v3'; // 변경 시 localStorage 초기화
+  const STORAGE_KEY = `tripPrepData-Nanjing2025-${APP_VERSION}`;
 
-  <!-- ================= SCRIPTS ================= -->
-  <script>
-  (function(){
-    /* --------------------------------------------------------------
-     * CONFIG
-     * ------------------------------------------------------------*/
-    const CONFIG = {
-      storageKey: 'PrineFamilyNanjing2025-v3',
-      teamMembers: ["강문순","김준형","김현정","안상현","김현주","박영순"],
-      sections: { plan:"집결계획", info:"주요안내", checklist:"준비물", schedule:"일정표" },
-      checklistItems: {
-        docs:[
-          {id:'c1',text:'여권 (사본 별도 보관)'},
-          {id:'c2',text:'항공권 E-ticket'},
-          {id:'c3',text:'해외사용 가능 신용카드'},
-          {id:'c4',text:'위안화 현금 (소액권)'}
-        ],
-        clothing:[
-          {id:'c5',text:'여름옷, 편한 신발, 속옷'},
-          {id:'c6',text:'냉방 대비용 겉옷'},
-          {id:'c7',text:'모자, 선글라스, 자외선 차단제'},
-          {id:'c8',text:'접는 우산/양산 (선택)'}
-        ],
-        electronics:[
-          {id:'c9',text:'스마트폰, 보조배터리'},
-          {id:'c10',text:'중국용 전원 어댑터'},
-          {id:'c11',text:'충전 케이블, 멀티탭 (선택)'}
-        ],
-        medicine:[
-          {id:'c12',text:'개인 복용약 (필수)'},
-          {id:'c13',text:'종합감기약, 소화제, 밴드 등'},
-          {id:'c14',text:'비상 간식 (선택)'}
-        ]
-      }
-    };
+  // ===== 팀원 =====
+  const TEAM_MEMBERS = ["강문순","김준형","김현정","안상현","김현주","박영순"];
 
-    /* --------------------------------------------------------------
-     * STATE
-     * ------------------------------------------------------------*/
-    let currentUser = null;
-    let confirmationData = {};
+  // ===== 섹션 정의 (온라인 공유용 키) =====
+  const SECTIONS = { plan:"집결계획", info:"주요안내", checklist:"준비물", schedule:"일정표" };
 
-    /* --------------------------------------------------------------
-     * DOM REFS
-     * ------------------------------------------------------------*/
-    const loginScreen = document.getElementById('login-screen');
-    const userScreen = document.getElementById('user-screen');
-    const summaryScreen = document.getElementById('summary-screen');
-    const nameSelector = document.getElementById('name-selector');
-    const userNameSpan = document.getElementById('user-name');
-    const logoutButton = document.getElementById('logout-button');
-    const userSummaryButton = document.getElementById('user-summary-button');
-    const gotoSummaryFromLogin = document.getElementById('goto-summary-from-login');
-    const summaryBackButton = document.getElementById('summary-back-button');
-    const floatingSummaryBtn = document.getElementById('floating-summary');
+  // ===== 체크리스트 항목 =====
+  const CHECK_ITEMS = {
+    docs: [
+      { id:'c1', text:'여권 (사본 별도 보관)' },
+      { id:'c2', text:'항공권 E-ticket' },
+      { id:'c3', text:'해외사용 가능 신용카드' },
+      { id:'c4', text:'위안화 현금 (소액권)' }
+    ],
+    clothing: [
+      { id:'c5', text:'여름옷, 편한 신발, 속옷' },
+      { id:'c6', text:'냉방 대비용 겉옷' },
+      { id:'c7', text:'모자, 선글라스, 자외선 차단제' },
+      { id:'c8', text:'접는 우산/양산 (선택)' }
+    ],
+    electronics: [
+      { id:'c9', text:'스마트폰, 보조배터리' },
+      { id:'c10', text:'중국용 전원 어댑터' },
+      { id:'c11', text:'충전 케이블, 멀티탭 (선택)' }
+    ],
+    medicine: [
+      { id:'c12', text:'개인 복용약 (필수)' },
+      { id:'c13', text:'종합감기약, 소화제, 밴드 등' },
+      { id:'c14', text:'비상 간식 (선택)' }
+    ]
+  };
+  const CHECK_CATEGORY_LABEL = { docs:'서류/금융', clothing:'의류/생활', electronics:'전자기기', medicine:'상비약/기타' };
 
-    const userContentContainer = document.getElementById('user-content-sections');
-    const tplUserContent = document.getElementById('tpl-user-content');
-    const confirmationContainer = document.getElementById('confirmation-container');
+  // ===== Firestore 활성화 여부 감지 =====
+  let FIREBASE_ENABLED = true;
+  let firebaseConfig;
+  try {
+    firebaseConfig = JSON.parse(__firebase_config);
+    if (!firebaseConfig || firebaseConfig.apiKey === 'REPLACE_ME') FIREBASE_ENABLED = false;
+  } catch(err) {
+    FIREBASE_ENABLED = false;
+  }
+  const FIREBASE_APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'trip-prep-default';
+  const INITIAL_TOKEN = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
 
-    const userExportCsvButton = document.getElementById('user-export-csv-button');
-    const userImportDataButton = document.getElementById('user-import-data-button');
-    const summaryExportCsvButton = document.getElementById('summary-export-csv-button');
-    const summaryImportDataButton = document.getElementById('summary-import-data-button');
-    const importDataButtonLogin = document.getElementById('import-data-button-login');
+  // Firestore 핸들
+  let app, auth, db, docRef;
+  if (FIREBASE_ENABLED) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    // 문서 경로: artifacts/{appId}/public/data/trip_confirmations/status
+    docRef = doc(db, 'artifacts', FIREBASE_APP_ID, 'public', 'data', 'trip_confirmations', 'status');
+  }
 
-    /* --------------------------------------------------------------
-     * UTIL
-     * ------------------------------------------------------------*/
-    function safeJSONParse(str, fallback){
-      try { return JSON.parse(str); } catch(e){ return fallback; }
-    }
+  /* ------------------------------------------------------------------
+   * 전역 상태
+   * ---------------------------------------------------------------- */
+  let currentUser = null;               // 현재 선택된 팀원
+  let confirmationData = {};            // localStorage 상태 전체
+  let onlineData = {};                  // Firestore 문서 snapshot
+  let onlineShareEnabled = false;       // 사용자 온라인 공유 opt-in
 
-    function loadData(){
-      const raw = localStorage.getItem(CONFIG.storageKey);
-      if(raw){
-        confirmationData = safeJSONParse(raw, {});
-      }
-      if(!raw || !confirmationData || typeof confirmationData !== 'object' || Array.isArray(confirmationData)){
-        // init new data
-        confirmationData = {};
-        CONFIG.teamMembers.forEach(m => {
-          confirmationData[m] = {};
-          Object.keys(CONFIG.sections).forEach(sec => confirmationData[m][sec] = false);
-          confirmationData[m].checklist = {};
-          Object.keys(CONFIG.checklistItems).forEach(cat => {
-            CONFIG.checklistItems[cat].forEach(item => {
-              confirmationData[m].checklist[item.id] = false;
-            });
+  /* ------------------------------------------------------------------
+   * 도우미 함수: 엘리먼트 참조
+   * ---------------------------------------------------------------- */
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => document.querySelectorAll(sel);
+
+  const loginScreen = $('#login-screen');
+  const mainScreen = $('#main-screen');
+  const onlineScreen = $('#online-screen');
+  const nameSelector = $('#name-selector');
+  const userNameSpan = $('#user-name');
+  const mainContentContainer = $('#main-content-sections');
+  const onlineShareToggle = $('#online-share-toggle');
+
+  const exportCsvButton = $('#export-csv-button');
+  const logoutButton = $('#logout-button');
+  const resetDataButton = $('#reset-data-button');
+  const gotoOnlineTableButton = $('#goto-online-table');
+  const onlineBackButton = $('#online-back-button');
+
+  /* ------------------------------------------------------------------
+   * localStorage 관리
+   * ---------------------------------------------------------------- */
+  function initLocalData() {
+    confirmationData = {};
+    TEAM_MEMBERS.forEach(m => {
+      confirmationData[m] = { plan:false, info:false, checklist:false, schedule:false, checklistItems:{} };
+      Object.keys(CHECK_ITEMS).forEach(cat => {
+        CHECK_ITEMS[cat].forEach(it => { confirmationData[m].checklistItems[it.id] = false; });
+      });
+    });
+    saveLocal();
+  }
+  function loadLocal() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) { initLocalData(); return; }
+    try {
+      const parsed = JSON.parse(saved);
+      // 업그레이드 마이그레이션: 구조 변경 대비
+      TEAM_MEMBERS.forEach(m => {
+        if (!parsed[m]) parsed[m] = {};
+        parsed[m].plan ??= false;
+        parsed[m].info ??= false;
+        parsed[m].checklist ??= false;
+        parsed[m].schedule ??= false;
+        const items = parsed[m].checklistItems ?? {};
+        Object.keys(CHECK_ITEMS).forEach(cat => {
+          CHECK_ITEMS[cat].forEach(it => {
+            if (typeof items[it.id] === 'undefined') items[it.id] = false;
           });
         });
-        saveData();
-      } else {
-        // defensive fill for any missing keys (in case of older data)
-        CONFIG.teamMembers.forEach(m => {
-          if(!confirmationData[m]) confirmationData[m] = {};
-          Object.keys(CONFIG.sections).forEach(sec => {
-            if(typeof confirmationData[m][sec] !== 'boolean') confirmationData[m][sec] = false;
-          });
-          if(!confirmationData[m].checklist) confirmationData[m].checklist = {};
-          Object.keys(CONFIG.checklistItems).forEach(cat => {
-            CONFIG.checklistItems[cat].forEach(item => {
-              if(typeof confirmationData[m].checklist[item.id] !== 'boolean') confirmationData[m].checklist[item.id] = false;
-            });
-          });
-        });
-      }
-    }
-
-    function saveData(){
-      try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(confirmationData)); } catch(e){ console.error('save error', e); }
-    }
-
-    function exportToCsv(){
-      const headers = ['팀원', ...Object.values(CONFIG.sections)];
-      Object.keys(CONFIG.checklistItems).forEach(cat => {
-        CONFIG.checklistItems[cat].forEach(item => headers.push(item.text));
+        parsed[m].checklistItems = items;
       });
-      let csv = headers.join(',') + '\r\n';
-      CONFIG.teamMembers.forEach(member => {
-        const row = [member];
-        const ud = confirmationData[member] || {};
-        Object.keys(CONFIG.sections).forEach(sec => row.push(ud[sec] ? 'Y':'N'));
-        const cl = ud.checklist || {};
-        Object.keys(CONFIG.checklistItems).forEach(cat => {
-          CONFIG.checklistItems[cat].forEach(item => row.push(cl[item.id] ? 'Y':'N'));
-        });
-        csv += row.join(',') + '\r\n';
+      confirmationData = parsed;
+    } catch(err) {
+      console.error('localStorage parse 실패, 초기화', err);
+      initLocalData();
+    }
+  }
+  function saveLocal() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(confirmationData)); } catch(err) {
+      console.error('localStorage 저장 실패', err);
+    }
+  }
+  function resetLocalAndRerender() {
+    if (!confirm('모든 체크 상태(이 기기)를 초기화할까요?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    initLocalData();
+    if (currentUser) renderMainContent(currentUser);
+  }
+
+  /* ------------------------------------------------------------------
+   * 온라인 공유 데이터 업데이트
+   *   공개 범위: 섹션 4개(Boolean) + 준비물 완료 개수/총개수
+   * ---------------------------------------------------------------- */
+  const TOTAL_CHECK_ITEMS = Object.values(CHECK_ITEMS).reduce((acc, arr) => acc + arr.length, 0);
+
+  async function updateOnlineStatus(member) {
+    if (!FIREBASE_ENABLED || !onlineShareEnabled) return; // opt-in 조건
+    const d = confirmationData[member];
+    if (!d) return;
+    const doneCount = Object.values(d.checklistItems).filter(Boolean).length;
+    const fieldUpdate = {};
+    fieldUpdate[`${member}.plan`] = !!d.plan;
+    fieldUpdate[`${member}.info`] = !!d.info;
+    fieldUpdate[`${member}.checklist`] = !!d.checklist;
+    fieldUpdate[`${member}.schedule`] = !!d.schedule;
+    fieldUpdate[`${member}.checkDone`] = doneCount;
+    fieldUpdate[`${member}.checkTotal`] = TOTAL_CHECK_ITEMS;
+    try {
+      await updateDoc(docRef, fieldUpdate);
+    } catch(err) {
+      console.warn('updateDoc 실패, setDoc merge 시도', err);
+      await setDoc(docRef, mkEmptyOnlineDoc(), { merge:true });
+      await updateDoc(docRef, fieldUpdate);
+    }
+  }
+
+  function mkEmptyOnlineDoc() {
+    const obj = {};
+    TEAM_MEMBERS.forEach(m => {
+      obj[m] = { plan:false, info:false, checklist:false, schedule:false, checkDone:0, checkTotal:TOTAL_CHECK_ITEMS };
+    });
+    return obj;
+  }
+
+  /* ------------------------------------------------------------------
+   * 온라인 테이블 렌더링
+   * ---------------------------------------------------------------- */
+  function renderOnlineTable(data) {
+    const container = document.getElementById('confirmation-container');
+    if (!container) return;
+    const sectionKeys = Object.keys(SECTIONS);
+    const sectionNames = Object.values(SECTIONS);
+
+    let html = '<table class="w-full confirmation-table"><thead><tr><th class="member-name">팀원</th>';
+    sectionNames.forEach(name => { html += `<th>${name}</th>`; });
+    html += '<th>준비물 진행</th></tr></thead><tbody>';
+
+    TEAM_MEMBERS.forEach(member => {
+      const md = data?.[member] || {};
+      const mk = key => !!md[key];
+      const done = md.checkDone ?? 0;
+      const total = md.checkTotal ?? TOTAL_CHECK_ITEMS;
+      html += `<tr><td class="member-name">${member}</td>`;
+      sectionKeys.forEach(k => {
+        const checked = mk(k) ? 'checked' : '';
+        // 섹션은 읽기 전용(온라인 화면에서 편집 막음) → disabled
+        html += `<td><input type="checkbox" disabled ${checked}></td>`;
       });
-      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href=url;link.download='trip_preparation_status.csv';document.body.appendChild(link);link.click();document.body.removeChild(link);URL.revokeObjectURL(url);
-    }
+      html += `<td>${done}/${total}</td></tr>`;
+    });
 
-    function importFromCsvText(text){
-      // Very simple CSV import: expect same column order as export.
-      const lines = text.trim().split(/\r?\n/);
-      if(lines.length < 2) return false;
-      const header = lines[0].split(',').map(h=>h.trim());
-      const memberIdx = header.indexOf('팀원');
-      if(memberIdx !== 0) console.warn('CSV header unexpected, attempting parse anyway');
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  }
 
-      // Build a map from header index to field type
-      const secOrder = Object.keys(CONFIG.sections); // plan,info,checklist,schedule
-      const secCount = secOrder.length;
-      const clItems = [];
-      Object.keys(CONFIG.checklistItems).forEach(cat => {
-        CONFIG.checklistItems[cat].forEach(item => clItems.push(item));
-      });
+  /* ------------------------------------------------------------------
+   * 개인 화면 렌더
+   * ---------------------------------------------------------------- */
+  function renderLoginScreen() {
+    nameSelector.innerHTML = '';
+    TEAM_MEMBERS.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = "p-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500";
+      btn.textContent = name;
+      btn.dataset.name = name;
+      nameSelector.appendChild(btn);
+    });
+  }
 
-      const expectedLen = 1 + secCount + clItems.length;
-      if(header.length < expectedLen){ console.warn('CSV fewer cols than expected'); }
+  function renderMainContent(user) {
+    userNameSpan.textContent = user;
+    const tmpl = document.getElementById('tmpl-sections');
+    mainContentContainer.innerHTML = '';
+    mainContentContainer.appendChild(tmpl.content.cloneNode(true));
+    populateContent();
+    applyUserState(user);
+  }
 
-      const newData = JSON.parse(JSON.stringify(confirmationData));
-
-      for(let i=1;i<lines.length;i++){
-        if(!lines[i].trim()) continue;
-        const cols = lines[i].split(',');
-        const member = cols[0]?.trim();
-        if(!member || !newData[member]) continue; // skip unknown
-        let colIdx = 1;
-        // sections
-        secOrder.forEach(sec => {
-          const val = cols[colIdx++]?.trim()?.toUpperCase();
-          newData[member][sec] = (val === 'Y');
-        });
-        // checklist
-        clItems.forEach(item => {
-          const val = cols[colIdx++]?.trim()?.toUpperCase();
-          newData[member].checklist[item.id] = (val === 'Y');
-        });
-      }
-
-      confirmationData = newData;
-      saveData();
-      refreshAllUI();
-      return true;
-    }
-
-    function importFromFileDialog(){
-      const input = document.createElement('input');
-      input.type='file';input.accept='.csv,text/csv';
-      input.addEventListener('change',()=>{
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = e => { importFromCsvText(e.target.result); };
-        reader.readAsText(file,'utf-8');
-      });
-      input.click();
-    }
-
-    /* --------------------------------------------------------------
-     * LOGIN SCREEN RENDER
-     * ------------------------------------------------------------*/
-    function renderLoginScreen(){
-      nameSelector.innerHTML='';
-      CONFIG.teamMembers.forEach(name => {
-        const btn = document.createElement('button');
-        btn.className='p-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500';
-        btn.textContent=name;btn.dataset.name=name;nameSelector.appendChild(btn);
-      });
-    }
-
-    /* --------------------------------------------------------------
-     * USER SCREEN RENDER (sections)
-     * ------------------------------------------------------------*/
-    function renderUserScreen(user){
-      userNameSpan.textContent = user;
-      userContentContainer.innerHTML='';
-      const frag = tplUserContent.content.cloneNode(true);
-      userContentContainer.appendChild(frag);
-      populateUserContent();
-      updateCheckboxesForUser(user);
-      floatingSummaryBtn.classList.remove('hidden');
-    }
-
-    function populateUserContent(){
-      // --- Section: 첫날 집결 계획 (Full table)
-      document.getElementById('section-plan').innerHTML = `
-        <div class="section-header">
-          <h2 class="section-title"><i class="fas fa-plane-departure mr-3"></i>첫날 집결 및 출국 계획</h2>
-          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end"><label for="check-plan" class="text-sm font-medium text-gray-600">확인완료</label><input type="checkbox" id="check-plan" data-section="plan" class="h-5 w-5 rounded border-gray-300 text-blue-600"></div>
+  /* ------------------------------------------------------------------
+   * 콘텐츠 섹션 HTML 채우기
+   * ---------------------------------------------------------------- */
+  function populateContent() {
+    /* --- Section 1: 집결 계획 --- */
+    $('#section-plan').innerHTML = `
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-plane-departure mr-3"></i>첫날 집결 및 출국 계획</h2>
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+          <label for="check-plan" class="text-sm font-medium text-gray-600 dark:text-gray-300">확인완료</label>
+          <input type="checkbox" id="check-plan" data-section="plan" class="h-5 w-5 rounded border-gray-300 text-blue-600" />
         </div>
-        <div class="section-content"><div class="overflow-x-auto"><table class="w-full text-left border-collapse">
-          <thead class="bg-blue-50"><tr><th class="p-3 font-semibold text-sm">시간</th><th class="p-3 font-semibold text-sm">계획</th><th class="p-3 font-semibold text-sm">장소</th><th class="p-3 font-semibold text-sm">담당/비고</th></tr></thead>
-          <tbody>
-            <tr class="border-b"><td class="p-3">09:20</td><td class="p-3">전원 집결/인원 점검</td><td class="p-3">인천공항 제1터미널 3층 F열 아시아나 카운터 앞</td><td class="p-3">김현정 (리더)</td></tr>
-            <tr class="border-b"><td class="p-3">09:30</td><td class="p-3">단체 수속/수하물 위탁</td><td class="p-3">아시아나항공 카운터</td><td class="p-3">전원 (여권 필수)</td></tr>
-            <tr class="border-b"><td class="p-3">10:30</td><td class="p-3">보안 검색/출국 심사</td><td class="p-3">3층 출국장</td><td class="p-3">개별 진행</td></tr>
-            <tr class="border-b"><td class="p-3">11:00</td><td class="p-3">자유시간 및 식사</td><td class="p-3">면세구역</td><td class="p-3">개별/그룹 활동</td></tr>
-            <tr class="border-b"><td class="p-3">11:50</td><td class="p-3">탑승구 앞 집결</td><td class="p-3">탑승구 (E-ticket 확인)</td><td class="p-3 text-red-500 font-bold">시간 엄수</td></tr>
-            <tr><td class="p-3">12:20</td><td class="p-3">남경으로 출발 (OZ349)</td><td class="p-3">-</td><td class="p-3">-</td></tr>
-          </tbody>
-        </table></div></div>`;
-
-      // --- Section: 주요 안내사항 (merged content both versions)
-      document.getElementById('section-info').innerHTML = `
-        <div class="section-header">
-          <h2 class="section-title"><i class="fas fa-info-circle mr-3"></i>여행 중 주요 안내사항</h2>
-          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end"><label for="check-info" class="text-sm font-medium text-gray-600">확인완료</label><input type="checkbox" id="check-info" data-section="info" class="h-5 w-5 rounded border-gray-300 text-blue-600"></div>
+      </div>
+      <div class="section-content">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-blue-50 dark:bg-blue-900/40"><tr><th class="p-3 font-semibold text-sm">시간</th><th class="p-3 font-semibold text-sm">계획</th><th class="p-3 font-semibold text-sm">장소</th><th class="p-3 font-semibold text-sm">담당/비고</th></tr></thead>
+            <tbody>
+              <tr class="border-b"><td class="p-3">09:20</td><td class="p-3">전원 집결/인원 점검</td><td class="p-3">인천공항 제1터미널 3층 F열 아시아나 카운터 앞</td><td class="p-3">김현정 (리더)</td></tr>
+              <tr class="border-b"><td class="p-3">09:30</td><td class="p-3">단체 수속/수하물 위탁</td><td class="p-3">아시아나항공 카운터</td><td class="p-3">전원 (여권 필수)</td></tr>
+              <tr class="border-b"><td class="p-3">10:30</td><td class="p-3">보안 검색/출국 심사</td><td class="p-3">3층 출국장</td><td class="p-3">개별 진행</td></tr>
+              <tr class="border-b"><td class="p-3">11:00</td><td class="p-3">자유시간 및 식사</td><td class="p-3">면세구역</td><td class="p-3">개별/그룹 활동</td></tr>
+              <tr class="border-b"><td class="p-3">11:50</td><td class="p-3">탑승구 앞 집결</td><td class="p-3">탑승구 (E-ticket 확인)</td><td class="p-3 text-red-500 font-bold">시간 엄수</td></tr>
+              <tr><td class="p-3">12:20</td><td class="p-3">남경으로 출발 (OZ349)</td><td class="p-3">-</td><td class="p-3">-</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div class="section-content space-y-4">
-          <div class="info-section">
-            <h4 class="info-title"><i class="fas fa-users-cog mr-2"></i>주요 담당자 안내</h4>
-            <p class="mb-2">여행 중 도움이 필요할 때, 아래 담당자에게 문의하세요.</p>
-            <ul class="list-disc list-inside ml-4 space-y-2">
-              <li><strong>총괄 리더 (김현정):</strong> 전체 일정, 가이드 소통, 공동경비 등</li>
-              <li><strong>기술 지원 (안상현):</strong> 인터넷, 결제 앱 등 기술 문제</li>
-              <li><strong>건강 담당 (김현주):</strong> 공용 구급약, 건강 관련 사항</li>
+      </div>`;
+
+    /* --- Section 2: 주요 안내사항 --- */
+    $('#section-info').innerHTML = `
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-info-circle mr-3"></i>여행 중 주요 안내사항</h2>
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+          <label for="check-info" class="text-sm font-medium text-gray-600 dark:text-gray-300">확인완료</label>
+          <input type="checkbox" id="check-info" data-section="info" class="h-5 w-5 rounded border-gray-300 text-blue-600" />
+        </div>
+      </div>
+      <div class="section-content space-y-4">
+        <div class="info-section">
+          <h4 class="info-title"><i class="fas fa-users-cog mr-2"></i>주요 담당자 안내</h4>
+          <p class="mb-2">여행 중 도움이 필요할 때, 아래 담당자에게 문의하세요.</p>
+          <ul class="list-disc list-inside ml-4 space-y-2">
+            <li><strong>총괄 리더 (김현정):</strong> 전체 일정, 가이드 소통, 공동경비 등</li>
+            <li><strong>기술 지원 (안상현):</strong> 인터넷, 결제 앱 등 기술 문제</li>
+            <li><strong>건강 담당 (김현주):</strong> 공용 구급약, 건강 관련 사항</li>
+          </ul>
+        </div>
+        <div class="info-section">
+          <h4 class="info-title"><i class="fas fa-walking mr-2"></i>건강 및 체력 관리</h4>
+          <p>2일차, 3일차는 도보 이동이 많고 7월 말 남경 날씨는 매우 더울 것으로 예상되니, 편한 신발과 가벼운 옷차림은 필수입니다. 어르신들의 컨디션을 고려하여 가이드에게 동선 조정을 요청했으며, 하루 1~2회 카페 휴식 시간을 가질 예정입니다.</p>
+        </div>
+        <div class="info-section">
+          <h4 class="info-title"><i class="fas fa-utensils mr-2"></i>식사 및 비상 식량</h4>
+          <p>여행 중 1회 한식당을 이용할 예정입니다. 그 외 현지 음식이 입맛에 맞지 않을 경우를 대비하여, 비상 식량(김, 김치, 컵라면, 햇반 등)을 준비했습니다. (담당: 김현정)</p>
+        </div>
+        <div class="info-section">
+          <h4 class="info-title"><i class="fas fa-wifi mr-2"></i>인터넷 사용: 각자 선택하여 준비</h4>
+          <p class="mb-4">아래 표를 보시고 본인에게 맞는 방식을 선택하여 준비해주세요.</p>
+          <table class="w-full comparison-table mb-4">
+            <thead><tr><th>구분</th><th>국제 로밍</th><th>중국 현지 유심 (eSIM)</th></tr></thead>
+            <tbody>
+              <tr><td class="font-semibold">카톡/Gmail</td><td class="text-green-600 font-bold">바로 사용 가능</td><td class="text-red-600 font-bold">사용 불가 (VPN 필요)</td></tr>
+              <tr><td class="font-semibold">요금</td><td>비교적 높음</td><td>매우 저렴</td></tr>
+              <tr><td class="font-semibold">장점</td><td>한국 번호 유지, 인증 편리</td><td>저렴하고 빠른 현지 데이터</td></tr>
+            </tbody>
+          </table>
+          <div class="highlight-box">
+            <p class="font-bold text-lg">우리 팀의 준비 계획</p>
+            <ul class="list-disc list-inside mt-2">
+              <li><strong>김현정:</strong> <span class="font-bold text-blue-600">국제 로밍</span> 사용 확정.</li>
+              <li><strong>나머지 팀원:</strong> <span class="font-bold">로밍 또는 현지 유심 중 자유롭게 선택</span>해주세요. 로밍은 각자 통신사에, 유심은 기술 지원 담당 <span class="font-bold">안상현</span>에게 문의.</li>
             </ul>
           </div>
-          <div class="info-section">
-            <h4 class="info-title"><i class="fas fa-walking mr-2"></i>건강 및 체력 관리</h4>
-            <p>2일차, 3일차는 도보 이동이 많고 7월 말 남경 날씨는 매우 더울 것으로 예상되니, 편한 신발과 가벼운 옷차림은 필수입니다. 어르신들의 컨디션을 고려하여 가이드에게 동선 조정을 요청했으며, 하루 1~2회 카페 휴식 시간을 가질 예정입니다.</p>
-          </div>
-          <div class="info-section">
-            <h4 class="info-title"><i class="fas fa-utensils mr-2"></i>식사 및 비상 식량</h4>
-            <p>여행 중 1회 한식당을 이용할 예정입니다. 그 외 현지 음식이 입맛에 맞지 않을 경우를 대비하여, 비상 식량(김, 김치, 컵라면, 햇반 등)을 준비했습니다. (담당: 김현정)</p>
-          </div>
-          <div class="info-section">
-            <h4 class="info-title"><i class="fas fa-wifi mr-2"></i>인터넷 사용: 로밍 vs 현지 유심(eSIM)</h4>
-            <p class="mb-4">중국에서는 인터넷 사용 방식에 따라 카톡/Gmail 사용 여부, 요금 등이 크게 달라집니다. 아래 비교표와 팀 준비 계획을 확인한 뒤 본인에게 맞게 준비해주세요.</p>
-            <table class="w-full comparison-table mb-4">
-              <thead><tr><th>구분</th><th>국제 로밍</th><th>중국 현지 유심 (eSIM)</th></tr></thead>
-              <tbody>
-                <tr><td class="font-semibold">카톡/Gmail</td><td class="text-green-600 font-bold">바로 사용 가능 (VPN 불필요)</td><td class="text-red-600 font-bold">사용 불가 (VPN 필요)</td></tr>
-                <tr><td class="font-semibold">요금</td><td>비교적 높음</td><td>매우 저렴</td></tr>
-                <tr><td class="font-semibold">장점</td><td>한국 번호 유지, 인증 편리</td><td>저렴하고 빠른 현지 데이터</td></tr>
-              </tbody>
-            </table>
-            <div class="highlight-box-amber">
-              <p class="font-bold text-lg">우리 팀의 준비 계획</p>
-              <ul class="list-disc list-inside mt-2">
-                <li><strong>중요 연락 담당 (김현정)</strong>: <span class="font-bold text-blue-600">국제 로밍</span>으로 한국과의 중요 연락 및 인증을 담당합니다.</li>
-                <li><strong>나머지 팀원 (5명)</strong>: <span class="font-bold text-blue-600">중국 현지 유심(eSIM)</span> 사용을 추천합니다. 비용 절감 + 빠른 데이터. 준비는 <strong>안상현</strong>에게 문의.</li>
-                <li class="text-gray-600 text-sm mt-2">※ 원하면 로밍을 선택해도 됩니다. 다만 카톡/인증이 꼭 필요한 분은 로밍이 더 편할 수 있습니다.</li>
-              </ul>
-            </div>
-          </div>
-          <div class="info-section">
-            <h4 class="info-title"><i class="fas fa-money-bill-wave mr-2"></i>개인 경비 및 중국 현지 결제 방법</h4>
-            <p class="mb-2">여행경비 대부분은 이미 지불되었습니다. 현지에서 필요한 개인 경비는 <strong>개인 쇼핑, 간식, 선택적 가이드/기사님 팁</strong> 정도입니다. 각자 준비해주세요.</p>
-            <p class="mb-4">중국은 대부분 모바일 QR 결제를 사용합니다. 아래 두 가지 방법을 준비하면 매우 편리합니다.</p>
-            <div class="p-4 border rounded-md mb-3">
-              <h5 class="font-semibold text-lg text-green-600">방법 1. 네이버페이 (현금 충전 방식)</h5>
-              <p class="text-sm text-gray-600 mt-1">한국에서 쓰던 네이버페이 앱으로 가게의 QR코드를 찍어 바로 결제하는 방식입니다. 네이버페이 머니(현금)를 미리 충전해두면 됩니다.</p>
-            </div>
-            <div class="p-4 border rounded-md mb-3">
-              <h5 class="font-semibold text-lg text-blue-600">방법 2. 알리페이 (신용카드 연동)</h5>
-              <p class="text-sm text-gray-600 mt-1">알리페이 앱에 해외결제 가능 신용카드를 등록하여 사용하는 방식입니다. 네이버페이가 안되는 곳에서 유용합니다.</p>
-            </div>
-            <div class="highlight-box-blue">
-              <p class="font-bold text-center text-lg">어려우신가요? 걱정 마세요!</p>
-              <p class="text-center mt-2 text-gray-700">위 결제 방법 준비가 어려우신 분들은 <strong>출국 당일 공항에서 안상현님이 도와드릴 예정</strong>입니다. 스마트폰과 신용카드만 잘 챙겨오세요. 단, 여행 중 즉시 결제를 위해 미리 앱을 설치하고 충전해두시는 것이 가장 좋습니다.</p>
-            </div>
-          </div>
-          <div class="info-section">
-            <h4 class="info-title"><i class="fas fa-shield-alt mr-2"></i>안전 및 기타 유의사항</h4>
-            <ul class="list-disc list-inside ml-4 mt-2 space-y-2 text-gray-700">
-              <li><strong>소지품 관리:</strong> 관광지 등 사람이 많은 곳에서는 소매치기를 항상 조심하시고, 여권, 현금 등 귀중품은 안전하게 보관해주세요.</li>
-              <li><strong>비상시 대처:</strong> 만일의 상황을 대비해 가이드와 숙소 연락처는 항상 소지하시고, 여권 사본(사진)을 휴대폰에 저장해두세요.</li>
-              <li><strong>단체 행동:</strong> 가장 안전한 여행은 팀과 함께, 가이드의 안내에 따라 이동하는 것입니다. 돌발적인 개인 행동은 자제 바랍니다.</li>
-            </ul>
-          </div>
-        </div>`;
-
-      // --- Section: 준비물 체크리스트
-      let checklistHTML = `
-        <div class="section-header">
-          <h2 class="section-title"><i class="fas fa-list-check mr-3"></i>준비물 체크리스트</h2>
-          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end"><label for="check-checklist" class="text-sm font-medium text-gray-600">전체확인</label><input type="checkbox" id="check-checklist" data-section="checklist" class="h-5 w-5 rounded border-gray-300 text-blue-600"></div>
         </div>
-        <div id="checklist-container" class="section-content grid grid-cols-1 md:grid-cols-2 gap-6">`;
-      const categories = { docs:'서류/금융', clothing:'의류/생활', electronics:'전자기기', medicine:'상비약/기타' };
-      for(const cat in CONFIG.checklistItems){
-        checklistHTML += `<div><h4 class="font-bold mb-2">${categories[cat]}</h4><ul class="space-y-2">`;
-        CONFIG.checklistItems[cat].forEach(item => {
-          checklistHTML += `<li><input type="checkbox" id="${item.id}" data-section="checklist" data-item="${item.id}" class="h-4 w-4 rounded border-gray-300 text-blue-600"><label for="${item.id}" class="ml-2">${item.text}</label></li>`;
+        <div class="info-section">
+          <h4 class="info-title"><i class="fas fa-money-bill-wave mr-2"></i>개인 경비 및 결제 방법 상세 안내</h4>
+          <p class="mb-2">개인 경비(쇼핑, 간식, 선택적 팁)만 각자 준비하시면 됩니다. 중국은 QR 결제가 편리합니다.</p>
+          <div class="highlight-box">
+            <p class="font-bold text-center text-lg">결제 앱 준비가 어려우신가요?</p>
+            <p class="text-center mt-2 text-gray-700 dark:text-gray-100">출국 당일 공항에서 기술 지원 담당 안상현이 도와드릴 예정입니다.</p>
+          </div>
+        </div>
+        <div class="info-section">
+          <h4 class="info-title"><i class="fas fa-shield-alt mr-2"></i>안전 및 기타 유의사항</h4>
+          <ul class="list-disc list-inside ml-4 mt-2 space-y-2">
+            <li><strong>소지품 관리:</strong> 관광지에서는 소매치기를 항상 조심하세요.</li>
+            <li><strong>비상시 대처:</strong> 가이드/숙소 연락처 소지, 여권 사본 휴대폰에 저장.</li>
+            <li><strong>단체 행동:</strong> 가장 안전한 여행은 가이드 안내에 따라 함께 이동하는 것입니다.</li>
+          </ul>
+        </div>
+      </div>`;
+
+    /* --- Section 3: 준비물 체크리스트 --- */
+    let checklistHTML = `
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-list-check mr-3"></i>준비물 체크리스트</h2>
+      </div>
+      <div id="checklist-container" class="section-content grid grid-cols-1 md:grid-cols-2 gap-6">`;
+    Object.keys(CHECK_ITEMS).forEach(cat => {
+      checklistHTML += `<div><h4 class="font-bold mb-2">${CHECK_CATEGORY_LABEL[cat]}</h4><ul class="space-y-2">`;
+      CHECK_ITEMS[cat].forEach(item => {
+        checklistHTML += `<li><input type="checkbox" id="${item.id}" data-section="checklist" data-item="${item.id}" class="h-4 w-4 rounded border-gray-300 text-blue-600" /><label for="${item.id}" class="ml-2">${item.text}</label></li>`;
+      });
+      checklistHTML += `</ul></div>`;
+    });
+    checklistHTML += `</div>`;
+    $('#section-checklist').innerHTML = checklistHTML;
+
+    /* --- Section 4: 일정표 --- */
+    $('#section-schedule').innerHTML = `
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-calendar-alt mr-3"></i>3박 4일 세부 일정표</h2>
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+          <label for="check-schedule" class="text-sm font-medium text-gray-600 dark:text-gray-300">확인완료</label>
+          <input type="checkbox" id="check-schedule" data-section="schedule" class="h-5 w-5 rounded border-gray-300 text-blue-600" />
+        </div>
+      </div>
+      <div class="section-content">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-blue-50 dark:bg-blue-900/40"><tr><th class="p-3 font-semibold text-sm">일자</th><th class="p-3 font-semibold text-sm">시간</th><th class="p-3 font-semibold text-sm">주요 활동</th><th class="p-3 font-semibold text-sm">식사</th></tr></thead>
+            <tbody>
+              <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">1일차 (7/26)</td><td class="p-3">오전/오후</td><td class="p-3">인천공항 집결(09:20), 남경 도착</td><td rowspan="2" class="p-3 align-top">석: 현지식</td></tr>
+              <tr class="border-b"><td class="p-3">오후</td><td class="p-3">교부영, 부자묘 옛거리 관광</td></tr>
+              <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">2일차 (7/27)</td><td class="p-3">오전</td><td class="p-3">남경대학살기념관, 이제항 위안부 박물관</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
+              <tr class="border-b"><td class="p-3">오후</td><td class="p-3">중산릉, 명효릉 관광 후 전신 마사지 체험</td></tr>
+              <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">3일차 (7/28)</td><td class="p-3">오전</td><td class="p-3">우수산 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
+              <tr class="border-b"><td class="p-3">오후</td><td class="p-3">더지플라자, 독립군 본부 터, 현무공원(뱃놀이)</td></tr>
+              <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">4일차 (7/29)</td><td class="p-3">오전</td><td class="p-3">남경 중화문 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식</td></tr>
+              <tr><td class="p-3">오후</td><td class="p-3">공항 이동 및 인천 도착(18:10)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  /* ------------------------------------------------------------------
+   * 사용자 상태 적용 (DOM -> state -> DOM 순서 제어)
+   * ---------------------------------------------------------------- */
+  function applyUserState(user) {
+    const d = confirmationData[user];
+    if (!d) return;
+    // 섹션 체크박스
+    ['plan','info','schedule','checklist'].forEach(sec => {
+      const cb = document.getElementById(`check-${sec}`);
+      if (cb) cb.checked = !!d[sec];
+    });
+    // 준비물
+    Object.keys(CHECK_ITEMS).forEach(cat => {
+      CHECK_ITEMS[cat].forEach(it => {
+        const cb = document.getElementById(it.id);
+        if (cb) cb.checked = !!d.checklistItems[it.id];
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------
+   * state 업데이트
+   * ---------------------------------------------------------------- */
+  function updateLocalState(user, section, isChecked, itemId=null) {
+    if (!confirmationData[user]) return;
+    if (itemId) {
+      confirmationData[user].checklistItems[itemId] = isChecked;
+      // checklist 섹션 자동 true 처리? -> 선택적. 여기선 하지 않음.
+    } else {
+      confirmationData[user][section] = isChecked;
+    }
+    saveLocal();
+    // 온라인 업로드는 섹션/전체 개수 변경 시 호출
+    updateOnlineStatus(user);
+  }
+
+  /* ------------------------------------------------------------------
+   * CSV 내보내기 (모바일 호환 / Web Share API)
+   * ---------------------------------------------------------------- */
+  function exportToCsv() {
+    let csv = '';
+    const headers = ['팀원', ...Object.values(SECTIONS)];
+    Object.keys(CHECK_ITEMS).forEach(cat => {
+      CHECK_ITEMS[cat].forEach(item => headers.push(item.text));
+    });
+    csv += headers.join(',') + '\r\n';
+
+    TEAM_MEMBERS.forEach(member => {
+      const d = confirmationData[member] || {};
+      const row = [member];
+      Object.keys(SECTIONS).forEach(sec => row.push(d[sec] ? 'Y':'N'));
+      Object.keys(CHECK_ITEMS).forEach(cat => {
+        CHECK_ITEMS[cat].forEach(item => {
+          row.push(d.checklistItems?.[item.id] ? 'Y':'N');
         });
-        checklistHTML += `</ul></div>`;
+      });
+      csv += row.join(',') + '\r\n';
+    });
+
+    const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+    const fileName = 'trip_preparation_status.csv';
+
+    // Web Share API (모바일)
+    const fileObj = new File([blob], fileName, { type:'text/csv' });
+    if (navigator.share && navigator.canShare?.({ files:[fileObj] })) {
+      navigator.share({ title:'남경 여행 준비 현황', text:'CSV 파일 공유', files:[fileObj] })
+        .catch(err => console.log('share cancelled', err));
+      return;
+    }
+
+    // 일반 다운로드
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }
+
+  /* ------------------------------------------------------------------
+   * 이벤트 바인딩
+   * ---------------------------------------------------------------- */
+  function setupEventListeners() {
+    // 이름 선택
+    nameSelector.addEventListener('click', ev => {
+      if (ev.target.tagName === 'BUTTON') {
+        currentUser = ev.target.dataset.name;
+        loginScreen.classList.add('hidden');
+        onlineScreen.classList.add('hidden');
+        mainScreen.classList.remove('hidden');
+        renderMainContent(currentUser);
       }
-      checklistHTML += `</div>`;
-      document.getElementById('section-checklist').innerHTML = checklistHTML;
+    });
 
-      // --- Section: 일정표 (full detailed table)
-      document.getElementById('section-schedule').innerHTML = `
-        <div class="section-header">
-          <h2 class="section-title"><i class="fas fa-calendar-alt mr-3"></i>3박 4일 세부 일정표</h2>
-          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end"><label for="check-schedule" class="text-sm font-medium text-gray-600">확인완료</label><input type="checkbox" id="check-schedule" data-section="schedule" class="h-5 w-5 rounded border-gray-300 text-blue-600"></div>
-        </div>
-        <div class="section-content"><div class="overflow-x-auto"><table class="w-full text-left border-collapse">
-          <thead class="bg-blue-50"><tr><th class="p-3 font-semibold text-sm">일자</th><th class="p-3 font-semibold text-sm">시간</th><th class="p-3 font-semibold text-sm">주요 활동</th><th class="p-3 font-semibold text-sm">식사</th></tr></thead>
-          <tbody>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">1일차 (7/26)</td><td class="p-3">오전/오후</td><td class="p-3">인천공항 집결(09:20), 남경 도착</td><td rowspan="2" class="p-3 align-top">석: 현지식</td></tr>
-            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">교부영, 부자묘 옛거리 관광</td></tr>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">2일차 (7/27)</td><td class="p-3">오전</td><td class="p-3">남경대학살기념관, 이제항 위안부 박물관</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
-            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">중산릉, 명효릉 관광 후 전신 마사지 체험</td></tr>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">3일차 (7/28)</td><td class="p-3">오전</td><td class="p-3">우수산 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식<br>석: 현지식</td></tr>
-            <tr class="border-b"><td class="p-3">오후</td><td class="p-3">더지플라자, 독립군 본부 터, 현무공원(뱃놀이)</td></tr>
-            <tr class="border-b"><td rowspan="2" class="p-3 font-medium align-top">4일차 (7/29)</td><td class="p-3">오전</td><td class="p-3">남경 중화문 관광</td><td rowspan="2" class="p-3 align-top">조: 호텔<br>중: 현지식</td></tr>
-            <tr><td class="p-3">오후</td><td class="p-3">공항 이동 및 인천 도착(18:10)</td></tr>
-          </tbody>
-        </table></div></div>`;
+    // 로그아웃(이름 다시 선택)
+    logoutButton.addEventListener('click', () => {
+      currentUser = null;
+      mainScreen.classList.add('hidden');
+      onlineScreen.classList.add('hidden');
+      loginScreen.classList.remove('hidden');
+    });
+
+    // 전체 현황 보기 (로그인 화면)
+    gotoOnlineTableButton.addEventListener('click', () => {
+      loginScreen.classList.add('hidden');
+      mainScreen.classList.add('hidden');
+      onlineScreen.classList.remove('hidden');
+    });
+
+    // 뒤로가기 (온라인 화면)
+    onlineBackButton.addEventListener('click', () => {
+      onlineScreen.classList.add('hidden');
+      loginScreen.classList.remove('hidden');
+    });
+
+    // CSV
+    exportCsvButton.addEventListener('click', exportToCsv);
+
+    // 초기화
+    resetDataButton.addEventListener('click', resetLocalAndRerender);
+
+    // 온라인 공유 토글
+    onlineShareToggle.addEventListener('change', e => {
+      onlineShareEnabled = e.target.checked;
+      if (onlineShareEnabled && currentUser) updateOnlineStatus(currentUser);
+    });
+
+    // 메인 컨텐츠 내 체크 변화 (섹션+준비물)
+    mainContentContainer.addEventListener('change', ev => {
+      if (ev.target.tagName === 'INPUT' && ev.target.type === 'checkbox') {
+        const { section, item } = ev.target.dataset;
+        if (!currentUser || !section) return;
+        updateLocalState(currentUser, section, ev.target.checked, item || null);
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------
+   * Firestore 실시간 리스너
+   * ---------------------------------------------------------------- */
+  async function initFirebase() {
+    if (!FIREBASE_ENABLED) {
+      console.log('Firebase 비활성: 온라인 공유 기능 꺼짐');
+      renderOnlineTable(mkEmptyOnlineDoc());
+      return;
     }
 
-    function updateCheckboxesForUser(user){
-      const ud = confirmationData[user]; if(!ud) return;
-      // section-level
-      Object.keys(CONFIG.sections).forEach(sec => {
-        const cb = document.getElementById(`check-${sec}`);
-        if(cb) cb.checked = !!ud[sec];
-      });
-      // checklist items
-      Object.keys(CONFIG.checklistItems).forEach(cat => {
-        CONFIG.checklistItems[cat].forEach(item => {
-          const cb = document.getElementById(item.id);
-          if(cb) cb.checked = !!ud.checklist[item.id];
-        });
-      });
-      // if all checklist items done, mark section-level
-      const allDone = areAllChecklistItemsDone(user);
-      const cbOverall = document.getElementById('check-checklist');
-      if(cbOverall) cbOverall.checked = allDone;
-    }
-
-    function areAllChecklistItemsDone(user){
-      const ud = confirmationData[user]; if(!ud || !ud.checklist) return false;
-      return Object.values(ud.checklist).every(Boolean);
-    }
-
-    /* --------------------------------------------------------------
-     * SUMMARY TABLE RENDER
-     * ------------------------------------------------------------*/
-    function renderConfirmationTable(){
-      const sectionKeys = Object.keys(CONFIG.sections);
-      const sectionNames = Object.values(CONFIG.sections);
-      let html = '<table class="w-full confirmation-table"><thead><tr><th class="member-name">팀원</th>';
-      sectionNames.forEach(n => html += `<th>${n}</th>`);
-      html += '</tr></thead><tbody>';
-      CONFIG.teamMembers.forEach(member => {
-        html += `<tr><td class="member-name">${member}</td>`;
-        sectionKeys.forEach(sec => {
-          const checked = confirmationData[member] && confirmationData[member][sec] ? 'checked' : '';
-          html += `<td><input type="checkbox" data-member="${member}" data-section="${sec}" ${checked}></td>`;
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table>';
-      confirmationContainer.innerHTML = html;
-    }
-
-    /* --------------------------------------------------------------
-     * STATE UPDATE
-     * ------------------------------------------------------------*/
-    function updateStatus(user, section, isChecked, itemId=null){
-      if(!confirmationData[user]) confirmationData[user] = {checklist:{}};
-      if(itemId){
-        if(!confirmationData[user].checklist) confirmationData[user].checklist = {};
-        confirmationData[user].checklist[itemId] = isChecked;
-        // If any change -> recompute section-level overall if all done
-        const allDone = areAllChecklistItemsDone(user);
-        confirmationData[user].checklistSectionComputed = allDone; // not used in logic but maybe debug
-        // do not auto set section-level; user manual OR auto below? We'll auto-update when all done.
-        if(allDone){ confirmationData[user].checklist = {...confirmationData[user].checklist}; /* noop */ }
+    try {
+      if (INITIAL_TOKEN) {
+        await signInWithCustomToken(auth, INITIAL_TOKEN);
       } else {
-        confirmationData[user][section] = isChecked;
-        if(section==='checklist' && !isChecked){
-          // leaving items as-is; user may uncheck overall but keep items
-        }
+        await signInAnonymously(auth);
       }
-      saveData();
-      if(currentUser===user) refreshSummaryRow(user); // minimal update
+    } catch(err) {
+      console.error('Firebase 인증 실패', err);
     }
 
-    function refreshSummaryRow(user){
-      // update summary table checkbox if it exists
-      const sectionKeys = Object.keys(CONFIG.sections);
-      sectionKeys.forEach(sec => {
-        const selector = `#confirmation-container input[type="checkbox"][data-member="${CSS.escape(user)}"][data-section="${CSS.escape(sec)}"]`;
-        const el = confirmationContainer.querySelector(selector);
-        if(el) el.checked = !!confirmationData[user][sec];
-      });
-    }
-
-    /* --------------------------------------------------------------
-     * SCREEN SWITCH
-     * ------------------------------------------------------------*/
-    function showLogin(){
-      loginScreen.style.display='block';
-      userScreen.style.display='none';
-      summaryScreen.style.display='none';
-      floatingSummaryBtn.classList.add('hidden');
-    }
-    function showUser(){
-      loginScreen.style.display='none';
-      userScreen.style.display='block';
-      summaryScreen.style.display='none';
-      floatingSummaryBtn.classList.remove('hidden');
-    }
-    function showSummary(){
-      loginScreen.style.display='none';
-      userScreen.style.display='none';
-      summaryScreen.style.display='block';
-      floatingSummaryBtn.classList.add('hidden');
-      renderConfirmationTable();
-    }
-
-    /* --------------------------------------------------------------
-     * EVENT HANDLERS
-     * ------------------------------------------------------------*/
-    nameSelector.addEventListener('click',e=>{
-      if(e.target.tagName==='BUTTON'){
-        currentUser = e.target.dataset.name;
-        showUser();
-        renderUserScreen(currentUser);
+    // 실시간 구독
+    onSnapshot(docRef, snapshot => {
+      if (snapshot.exists()) {
+        onlineData = snapshot.data();
+        renderOnlineTable(onlineData);
+      } else {
+        console.log('온라인 문서 없음 → 생성');
+        const initObj = mkEmptyOnlineDoc();
+        setDoc(docRef, initObj).catch(e=>console.error('초기 문서 생성 실패', e));
+        renderOnlineTable(initObj);
       }
+    }, err => {
+      console.error('onSnapshot 오류', err);
+      const container = document.getElementById('confirmation-container');
+      if (container) container.innerHTML = '<p class="text-red-500 text-center">데이터 로드 오류</p>';
+    });
+  }
+
+  /* ------------------------------------------------------------------
+   * 초기 실행
+   * ---------------------------------------------------------------- */
+  function main() {
+    // 브라우저 폼 자동복원 방지: load시 전체 해제 → state 적용
+    window.addEventListener('pageshow', () => {
+      $$('input[type="checkbox"]').forEach(cb => cb.checked = false);
     });
 
-    logoutButton.addEventListener('click',()=>{
-      currentUser=null;showLogin();
-    });
+    loadLocal();
+    renderLoginScreen();
+    setupEventListeners();
+    initFirebase();
+  }
 
-    userSummaryButton.addEventListener('click',()=>{showSummary();});
-    floatingSummaryBtn.addEventListener('click',()=>{showSummary();});
-    gotoSummaryFromLogin.addEventListener('click',()=>{showSummary();});
-    summaryBackButton.addEventListener('click',()=>{
-      if(currentUser){showUser();} else {showLogin();}
-    });
-
-    // Export / Import buttons
-    userExportCsvButton.addEventListener('click',exportToCsv);
-    summaryExportCsvButton.addEventListener('click',exportToCsv);
-    userImportDataButton.addEventListener('click',importFromFileDialog);
-    summaryImportDataButton.addEventListener('click',importFromFileDialog);
-    importDataButtonLogin.addEventListener('click',importFromFileDialog);
-
-    // Delegated: user content (section + checklist)
-    userContentContainer.addEventListener('change',e=>{
-      if(e.target.tagName==='INPUT' && e.target.type==='checkbox'){
-        const {section,item} = e.target.dataset;
-        if(currentUser && section){
-          updateStatus(currentUser, section, e.target.checked, item||null);
-          if(section==='checklist' && !item){
-            // overall toggle -> set all
-            Object.keys(CONFIG.checklistItems).forEach(cat=>{
-              CONFIG.checklistItems[cat].forEach(ci=>{
-                const cb = document.getElementById(ci.id);
-                if(cb){cb.checked = e.target.checked;}
-                confirmationData[currentUser].checklist[ci.id] = e.target.checked;
-              });
-            });
-            saveData();
-          } else if(section==='checklist' && item){
-            // update overall if now all done
-            const overallCb = document.getElementById('check-checklist');
-            if(overallCb){overallCb.checked = areAllChecklistItemsDone(currentUser);}            
-          }
-        }
-      }
-    });
-
-    // Delegated: summary container
-    confirmationContainer.addEventListener('change',e=>{
-      if(e.target.tagName==='INPUT' && e.target.type==='checkbox'){
-        const {member,section} = e.target.dataset;
-        if(member && section){
-          confirmationData[member][section] = e.target.checked;
-          saveData();
-          if(currentUser===member){
-            const secCb = document.getElementById(`check-${section}`); if(secCb) secCb.checked = e.target.checked;
-          }
-        }
-      }
-    });
-
-    /* --------------------------------------------------------------
-     * REFRESH ALL UI (after import)
-     * ------------------------------------------------------------*/
-    function refreshAllUI(){
-      if(currentUser){
-        renderUserScreen(currentUser);
-      }
-      renderConfirmationTable();
-    }
-
-    /* --------------------------------------------------------------
-     * INIT
-     * ------------------------------------------------------------*/
-    function init(){
-      loadData();
-      renderLoginScreen();
-      renderConfirmationTable();
-    }
-    init();
-
-    /* --------------------------------------------------------------
-     * OPTIONAL: AUTO-OPEN USER BY QUERY (?user=이름)
-     * ------------------------------------------------------------*/
-    const params = new URLSearchParams(location.search);
-    const qpUser = params.get('user');
-    if(qpUser && CONFIG.teamMembers.includes(qpUser)){
-      currentUser = qpUser;showUser();renderUserScreen(currentUser);
-    }
-
-  })();
-  </script>
-
-  <!-- =============================================================
-       FIREBASE REALTIME SHARING (OPTIONAL / COMMENTED OUT)
-       -----------------------------------------------------
-       • 이 오프라인 버전은 localStorage만 사용합니다.
-       • 아래 예시코드를 참고하여 Firebase Firestore에 동기화하고 싶다면
-         주석을 해제하고 CONFIG.storageKey 로드/세이브 부분을 Firestore와 연동하십시오.
-       • 원본 사용자 제공 2차 버전 코드 참고.
-  ============================================================= -->
-  <!--
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    // ... integrate as needed ...
-  </script>
-  -->
+  document.addEventListener('DOMContentLoaded', main);
+</script>
 
 </body>
 </html>
