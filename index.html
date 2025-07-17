@@ -168,6 +168,7 @@
       confirmationData[m]={};
       Object.keys(sections).forEach(k=>confirmationData[m][k]=false);
       confirmationData[m].checklist={};
+        confirmationData[m].checklist_all = false; // 
       for(const cat in checklistItems){
         checklistItems[cat].forEach(it=>{
           confirmationData[m].checklist[it.id]=false;
