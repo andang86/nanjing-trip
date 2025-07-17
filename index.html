@@ -33,28 +33,20 @@
 
 <!-- 🔥 Firebase 설정값을 이곳에 넣으세요 (배포 전 필수) -->
 <script>
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA27iXhZPvc0w6lzaw9mGpbe2pbIWliQtc",
-  authDomain: "freene-nanjing-2025.firebaseapp.com",
-  projectId: "freene-nanjing-2025",
-  storageBucket: "freene-nanjing-2025.firebasestorage.app",
-  messagingSenderId: "106888422558",
-  appId: "1:106888422558:web:429a64702973b71ecf878f",
-  measurementId: "G-1NJ9PW5TF8"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+  // === Firebase 전역 구성값 (모듈 스크립트에서 읽어 감) ===
+  const __firebase_config = JSON.stringify({
+    apiKey: "AIzaSyA27iXhZPvc0w6lzaw9mGpbe2pbIWliQtc",
+    authDomain: "freene-nanjing-2025.firebaseapp.com",
+    projectId: "freene-nanjing-2025",
+    storageBucket: "freene-nanjing-2025.firebasestorage.app",
+    messagingSenderId: "106888422558",
+    appId: "1:106888422558:web:429a64702973b71ecf878f",
+    measurementId: "G-1NJ9PW5TF8"
+  });
+  const __app_id = "freene-nanjing-2025";
+  const __initial_auth_token = ""; // 익명 로그인 사용
 </script>
+
 
 <div id="app-root" class="container mx-auto max-w-4xl p-4 sm:p-8">
   <header class="text-center mb-8">
@@ -238,7 +230,8 @@ const analytics = getAnalytics(app);
   const db = getFirestore(app);
 
   // 문서 경로: artifacts/{appId}/public/trip/status
-  const docRef = doc(db, "artifacts", appId, "public", "trip", "status");
+  const docRef = doc(db, "artifacts", appId, "public", "trip_confirmations", "status");
+
 
   async function firebaseInitAuth(){
     try{
