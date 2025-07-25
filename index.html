@@ -26,7 +26,7 @@
   .highlight-box{background:#fffbeb;border-left:4px solid #f59e0b;padding:1rem;margin-top:1rem;border-radius:4px}
   .comparison-table th,.comparison-table td{border:1px solid #e2e8f0;padding:.75rem;text-align:center;font-size:.875rem}
   .comparison-table th{background:#f1f5f9;font-weight:600}
-  .hidden-important{display:none !important;} /* Day-0 mode */
+  /* .hidden-important{display:none !important;} */ /* Day-0 mode */
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -354,12 +354,12 @@ const docRef = doc(db, "artifacts", appId, "public", "status");
   /* ------------------ 메인 화면 렌더 ------------------ */
   function renderMainContent(user){
     userNameSpan.textContent=user;
-    mainContentContainer.innerHTML=`
-      <div id="section-plan" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
-      <div id="section-info" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
-      <div id="section-checklist" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
-      <div id="section-schedule" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
-    `;
+   mainContentContainer.innerHTML=`
+  <div id="section-schedule" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
+  <div id="section-plan" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
+  <div id="section-info" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
+  <div id="section-checklist" class="accordion-item bg-white rounded-lg shadow-md border border-gray-200"></div>
+`;
     populateContent();
     applyUserState(user);
     setupAccordion();
